@@ -23,18 +23,24 @@ public class Periode {
     public Datum zuDatum(Chronologie chrono) {
         long laenge = this.gebeLaenge();
 
+        // Inizialisiert Jahr, Monat und Tag des neuen Datums mit den Nullwerten der Chonologie.
         long jahr = chrono.gebeJahrNull();
         int monat = chrono.gebeMonatNull();
         int tag = chrono.gebeTagNull();
 
+        // Überprüft ob die Länge eines Jahres in Tagen in laenge passt.
         while(laenge / chrono.gebeTageImJahr(jahr) >= 1) {
-            jahr++; laenge -= chrono.gebeTageImJahr(jahr);
+            // Subtrahiert die Länge des Jahres von laenge und addiert das Jahr zu jahr.
+            laenge -= chrono.gebeTageImJahr(jahr); jahr++;
         }
 
+        // Überprüft ob die Länge eines Monats in Tagen in laenge passt.
         while(laenge / chrono.gebeTageImMonat(jahr, monat) >= 1) {
-            monat++; laenge -= chrono.gebeTageImMonat(jahr, monat);
+            // Subtrahiert die Länge des Monats von laenge und addiert den Monat zu monat.
+            laenge -= chrono.gebeTageImMonat(jahr, monat); monat++;
         }
 
+        // Addiert die übrige laegne zu tag.
         tag += (int) laenge;
 
         return new Datum(chrono, jahr, monat, tag);

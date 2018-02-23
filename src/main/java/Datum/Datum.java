@@ -52,7 +52,7 @@ public class Datum {
 
     public boolean istVor(Datum datum) {
         if(!this.gleicheChronoWie(datum))
-            datum = datum.with(this.gebeChrono());
+            datum = datum.mit(this.gebeChrono());
 
         return this.gebeJahr() <= datum.gebeJahr()
                 && this.gebeMonat() <= datum.gebeMonat()
@@ -61,7 +61,7 @@ public class Datum {
 
     public boolean istGleich(Datum datum) {
         if(!this.gleicheChronoWie(datum))
-            datum = datum.with(this.gebeChrono());
+            datum = datum.mit(this.gebeChrono());
 
         return this.gebeJahr() == datum.gebeJahr()
                 && this.gebeMonat() == datum.gebeMonat()
@@ -70,7 +70,7 @@ public class Datum {
 
     public Periode differenz(Datum datum) {
         if(!this.gleicheChronoWie(datum))
-            datum = datum.with(this.gebeChrono());
+            datum = datum.mit(this.gebeChrono());
 
         if(this.istVor(datum))
             return new Periode(this, datum);
@@ -78,7 +78,7 @@ public class Datum {
             return new Periode(datum, this);
     }
 
-    public Datum with(Chronologie chrono) {
+    public Datum mit(Chronologie chrono) {
         return new Periode(this).zuDatum(chrono);
     }
 
@@ -124,7 +124,11 @@ public class Datum {
         long tage = this.zuTagen(this.gebeJahr());
         int woche = this.gebeChrono().gebeWocheNull();
 
-        for(; tage / this.gebeChrono().gebeTageInWoche(this.gebeJahr(), woche) >= 1; woche++);
+        // Überprüft ob die Länge einer Woche in tage passt.
+        while(tage / this.gebeChrono().gebeTageInWoche(this.gebeJahr(), woche) >= 1) {
+            // Addiert eins zu woche und subtrahiert die Länge der Woche von tage.
+            tage -= this.gebeChrono().gebeTageInWoche(this.gebeJahr(), woche); woche++;
+        }
 
         return woche;
     }
