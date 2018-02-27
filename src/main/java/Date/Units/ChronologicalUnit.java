@@ -1,23 +1,18 @@
-package Units;
+package Date.Units;
 
-import Chronologies.ChronologicalDomain;
-import Chronologies.Chronology;
-import Exceptions.ValueOutOfDomainException;
+import Date.Chronologies.Chronology;
+import Date.Exceptions.ValueOutOfDomainException;
+import Date.Utils.OrientedIterator;
 
-import java.util.Iterator;
-
-abstract class ChronologicalUnit<A extends ChronologicalUnit> implements Comparable<ChronologicalUnit>, Iterator<ChronologicalUnit> {
-    public enum Direction{UP, DOWN}
+public abstract class ChronologicalUnit<I extends ChronologicalUnit, S extends ChronologicalUnit> implements Comparable<I>, OrientedIterator<I> {
 
     public final long VALUE;
     public final ChronologicalDomain DOMAIN;
 
-    public final A SUPERIOR;
+    public final S SUPERIOR;
     public final Chronology CHRONO;
 
-    private Direction direct = Direction.UP;
-
-    public ChronologicalUnit(long value, ChronologicalDomain domain, A superior, Chronology chrono) throws ValueOutOfDomainException {
+    ChronologicalUnit(long value, ChronologicalDomain domain, S superior, Chronology chrono) throws ValueOutOfDomainException {
         this.VALUE = value;
         this.DOMAIN = domain;
 
@@ -28,13 +23,15 @@ abstract class ChronologicalUnit<A extends ChronologicalUnit> implements Compara
             throw new ValueOutOfDomainException(VALUE, DOMAIN);
     }
 
-    public abstract boolean valid();
+    public boolean valid() {
+        return DOMAIN.isDefined(VALUE);
+    }
 
     @Override
-    public boolean hasNext() {
+    public boolean hasNext(Orientation orient) {
         boolean hasNext = false;
 
-        switch (direct) {
+        switch (orient) {
             case UP: hasNext = hasLatter(); break;
             case DOWN: hasNext = hasFormer(); break;
         }
@@ -51,10 +48,13 @@ abstract class ChronologicalUnit<A extends ChronologicalUnit> implements Compara
     }
 
     @Override
-    public ChronologicalUnit next() {
-        ChronologicalUnit next = null;
+    public I next(Orientation orient) {
+        I next = null;
 
-        switch (direct) {
+        if(!hasNext(orient))
+            throw new IndexOutOfBoundsException();
+
+        switch (orient) {
             case UP: next = latter(); break;
             case DOWN: next = former(); break;
         }
@@ -62,16 +62,14 @@ abstract class ChronologicalUnit<A extends ChronologicalUnit> implements Compara
         return next;
     }
 
-    abstract ChronologicalUnit former();
+    abstract I former();
 
-    abstract ChronologicalUnit latter();
+    abstract I latter();
 
-    public Direction gebeDirect() {
-        return direct;
-    }
+    abstract I copyWith(long value, S superior);
 
-    public void setDirect(Direction direct) {
-        this.direct = direct;
+    I copyWith(long value) {
+        return copyWith(value, SUPERIOR);
     }
 
     @Override
@@ -81,7 +79,6 @@ abstract class ChronologicalUnit<A extends ChronologicalUnit> implements Compara
                 ", DOMAIN=" + DOMAIN +
                 ", SUPERIOR=" + SUPERIOR +
                 ", CHRONO=" + CHRONO +
-                ", direct=" + direct +
                 '}';
     }
 }
