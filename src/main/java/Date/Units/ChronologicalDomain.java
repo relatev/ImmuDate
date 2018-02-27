@@ -1,4 +1,4 @@
-package Chronologies;
+package Date.Units;
 
 public class ChronologicalDomain {
 
@@ -6,7 +6,7 @@ public class ChronologicalDomain {
     public final long MAX;
 
     public static ChronologicalDomain ofRange(int min, long range) {
-        return new ChronologicalDomain(min, min + range);
+        return new ChronologicalDomain(min, range);
     }
 
     public ChronologicalDomain(long min, long max) {
@@ -14,7 +14,7 @@ public class ChronologicalDomain {
         this.MAX = max;
     }
 
-    ChronologicalDomain() {
+    public ChronologicalDomain() {
         this(Long.MIN_VALUE, Long.MAX_VALUE);
     }
 
